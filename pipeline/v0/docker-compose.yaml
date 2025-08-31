@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pipeline_postgres
+    environment:
+      POSTGRES_DB: pipeline_db
+      POSTGRES_USER: pipeline_user
+      POSTGRES_PASSWORD: pipeline_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - pipeline_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: pipeline_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - pipeline_network
+
+  airflow-webserver:
+    image: apache/airflow:2.7.0-python3.11
+    container_name: pipeline_airflow_webserver
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+      DB_HOST: postgres
+      DB_NAME: pipeline_db
+      DB_USER: pipeline_user
+      DB_PASS: pipeline_pass
+      DB_PORT: 5432
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - .:/opt/airflow/pipeline
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pipeline_network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.0-python3.11
+    container_name: pipeline_airflow_scheduler
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      DB_HOST: postgres
+      DB_NAME: pipeline_db
+      DB_USER: pipeline_user
+      DB_PASS: pipeline_pass
+      DB_PORT: 5432
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - .:/opt/airflow/pipeline
+    command: scheduler
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pipeline_network
+
+  airflow-worker:
+    image: apache/airflow:2.7.0-python3.11
+    container_name: pipeline_airflow_worker
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      DB_HOST: postgres
+      DB_NAME: pipeline_db
+      DB_USER: pipeline_user
+      DB_PASS: pipeline_pass
+      DB_PORT: 5432
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - .:/opt/airflow/pipeline
+    command: celery worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pipeline_network
+
+  airflow-init:
+    image: apache/airflow:2.7.0-python3.11
+    container_name: pipeline_airflow_init
+    environment:
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://pipeline_user:pipeline_pass@postgres:5432/pipeline_db
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    volumes:
+      - .:/opt/airflow/pipeline
+    command: version
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - pipeline_network
+
+volumes:
+  postgres_data:
+
+networks:
+  pipeline_network:
+    driver: bridge
