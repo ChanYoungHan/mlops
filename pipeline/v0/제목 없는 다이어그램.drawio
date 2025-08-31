@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="26.1.1">
+  <diagram name="페이지-1" id="gQmSfiFKrXItp1nNsUoT">
+    <mxGraphModel dx="927" dy="875" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Peoiejjs_ImQveUcWt9B-5" value="Infer Pipeline" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="485" width="670" height="325" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-6" value="source : generator" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="Peoiejjs_ImQveUcWt9B-5">
+          <mxGeometry x="50" y="70" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="Peoiejjs_ImQveUcWt9B-5" source="Peoiejjs_ImQveUcWt9B-8" target="Peoiejjs_ImQveUcWt9B-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-8" value="airflow : processor" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="Peoiejjs_ImQveUcWt9B-5">
+          <mxGeometry x="290" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-9" value="DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="Peoiejjs_ImQveUcWt9B-5">
+          <mxGeometry x="200" y="185" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="Peoiejjs_ImQveUcWt9B-5" source="Peoiejjs_ImQveUcWt9B-6" target="Peoiejjs_ImQveUcWt9B-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-12" value="sink" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="Peoiejjs_ImQveUcWt9B-5">
+          <mxGeometry x="480" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Peoiejjs_ImQveUcWt9B-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="Peoiejjs_ImQveUcWt9B-5" source="Peoiejjs_ImQveUcWt9B-12" target="Peoiejjs_ImQveUcWt9B-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
