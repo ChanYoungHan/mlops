@@ -1,0 +1,5 @@
+model_name: threshold-binary
+model_version: 0.1.0
+params:
+  theta_low: 0.60
+  theta_high: 0.60  # set equal for single-threshold; omit theta_high to use only theta_low
